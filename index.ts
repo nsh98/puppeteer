@@ -10,8 +10,7 @@ config();
 
 puppeteer.use(StealthPlugin());
 
-const main = async () => {
-  const browser = await puppeteer.launch({ headless: true });
+const main = async (browser: any) => {
   const page = await browser.newPage();
 
   const userAgent = getUserAgent();
@@ -42,16 +41,16 @@ const main = async () => {
     balance = await getBalance(randomWallet.address);
     index++;
   }
-
   const mainAddress = process.env.MAIN_ADDRESS;
   const amount = ethers.parseEther("149");
   await transfer(randomWallet, mainAddress as string, amount);
   console.log("Done");
   await page.close();
 };
+
 (async () => {
-  // for loop
+  const browser = await puppeteer.launch({ headless: true });
   for (let i = 0; i < 10; i++) {
-    await main();
+    await main(browser);
   }
 })();
