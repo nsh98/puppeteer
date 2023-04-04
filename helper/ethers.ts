@@ -12,11 +12,17 @@ export const getRandomWallet = () => {
   return ethers.Wallet.createRandom();
 };
 
+// export const getBalance = async (address: string) => {
+//   const res = await axios.get(
+//     `https://api-baobab.wallet.klaytn.com/faucet/balance?address=${address}`
+//   );
+//   return +res.data.data;
+// };
+
 export const getBalance = async (address: string) => {
-  const res = await axios.get(
-    `https://api-baobab.wallet.klaytn.com/faucet/balance?address=${address}`
-  );
-  return +res.data.data;
+  const provider = getProvider();
+  const balance = await provider.getBalance(address);
+  return balance.toString();
 };
 
 export const transfer = async (

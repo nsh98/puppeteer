@@ -12,7 +12,6 @@ puppeteer.use(StealthPlugin());
 
 const main = async (browser: any) => {
   const page = await browser.newPage();
-
   const userAgent = getUserAgent();
   await page.setUserAgent(userAgent);
 
@@ -33,24 +32,29 @@ const main = async (browser: any) => {
   await faucetButton?.click();
 
   let balance = await getBalance(randomWallet.address);
-  console.log("[LOG] - balance:", balance);
   let index = 1;
-  while (balance === 0) {
-    console.log(`[${index}] ${balance}`);
-    await delay(5000);
+  while (balance === "0") {
+    console.log(`Balance is 0, try ${index} times`);
     balance = await getBalance(randomWallet.address);
     index++;
+    await delay(5000);
+    if (index > 5) {
+      console.log("Balance is still 0, skip this address");
+      return;
+    }
   }
   const mainAddress = process.env.MAIN_ADDRESS;
-  const amount = ethers.parseEther("149");
-  await transfer(randomWallet, mainAddress as string, amount);
-  console.log("Done");
+  const amount = ethers.parseEther(`${150 - 0.01}`);
+  const txHash = await transfer(randomWallet, mainAddress as string, amount);
+  console.log("Transfer done at: ", txHash);
+
   await page.close();
 };
 
 (async () => {
   const browser = await puppeteer.launch({ headless: true });
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 1000; i++) {
     await main(browser);
   }
+  await browser.close();
 })();
